@@ -316,6 +316,13 @@
     .premium-locked.unlocked { display: block; }
     .premium-locked-flex.unlocked { display: flex; }
 
+    /* Payment success banner (shown on Stripe redirect tab) */
+    .payment-success { max-width: 460px; margin: 3rem auto; padding: 2rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); text-align: center; display: none; }
+    .payment-success.visible { display: block; }
+    .payment-success-icon { color: #27500A; margin-bottom: 0.75rem; }
+    .payment-success-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; margin-bottom: 0.5rem; }
+    .payment-success-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
     /* Action Buttons */
     .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 460px; margin: 0 auto 2rem; }
     .action-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--surface); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.13s, border-color 0.13s; }
@@ -333,7 +340,7 @@
     @media print {
       body { padding: 1rem; background: #fff !important; color: #000 !important; }
       .progress-wrap, .fields, #quiz, .submit-btn, .error-msg, .faq-section, .footer,
-      .share-section, .action-buttons, .retry-area, .header .intro, .paywall-card { display: none !important; }
+      .share-section, .action-buttons, .retry-area, .header .intro, .paywall-card, .payment-success { display: none !important; }
       .premium-locked { display: block !important; }
       .result { display: block !important; }
       .wrap { max-width: 100%; }
@@ -367,6 +374,12 @@
       <div class="divider"></div>
       <p class="intro">Rate a brand of your choice across 12 statements covering quality, value, innovativeness and popularity. Compare it against other competing brands in its category using the 7-point scale below.</p>
     </header>
+
+    <div class="payment-success" id="payment-success">
+      <div class="payment-success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg></div>
+      <p class="payment-success-title">Payment Successful</p>
+      <p class="payment-success-text">Your full report has been unlocked. You can close this tab and return to your results.</p>
+    </div>
 
     <div class="fields">
       <div class="field-group">
@@ -556,14 +569,7 @@
       return localStorage.getItem('bls_paid') === '1';
     }
 
-    // Detect payment redirect
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('paid')) {
-        localStorage.setItem('bls_paid', '1');
-        window.history.replaceState({}, '', window.location.pathname);
-      }
-    })();
+    // Payment detection is handled after quiz initialization (bottom of script)
 
     const dimensions = [
       {
@@ -1183,18 +1189,22 @@ Be conversational, specific, and insightful. Reference the actual scores and rea
     }
 
     function purchaseReport() {
-      // Save quiz state so it can be restored after Stripe redirect
-      const state = {
-        name: document.getElementById('field-name').value,
-        email: document.getElementById('field-email').value,
-        company: document.getElementById('field-company').value,
-        brand: document.getElementById('field-brand').value,
-        category: document.getElementById('field-category').value,
-        consent: document.getElementById('field-consent').checked,
-        answers: answers.slice()
-      };
-      localStorage.setItem('bls_state', JSON.stringify(state));
-      window.location.href = STRIPE_PAYMENT_URL;
+      // Open Stripe in new tab so user stays on their results page
+      const win = window.open(STRIPE_PAYMENT_URL, '_blank');
+      if (!win) {
+        // Popup blocked — fall back to redirect
+        const state = {
+          name: document.getElementById('field-name').value,
+          email: document.getElementById('field-email').value,
+          company: document.getElementById('field-company').value,
+          brand: document.getElementById('field-brand').value,
+          category: document.getElementById('field-category').value,
+          consent: document.getElementById('field-consent').checked,
+          answers: answers.slice()
+        };
+        localStorage.setItem('bls_state', JSON.stringify(state));
+        window.location.href = STRIPE_PAYMENT_URL;
+      }
     }
 
     function unlockPremium() {
@@ -1209,26 +1219,44 @@ Be conversational, specific, and insightful. Reference the actual scores and rea
 
     buildQuiz();
 
-    // Restore state after returning from Stripe payment
+    // Listen for cross-tab payment (user pays in new tab, this tab unlocks)
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'bls_paid' && e.newValue === '1') {
+        unlockPremium();
+      }
+    });
+
+    // Handle page load after Stripe redirect
     (function () {
-      const saved = localStorage.getItem('bls_state');
-      if (saved && isPaid()) {
-        try {
-          const state = JSON.parse(saved);
-          document.getElementById('field-name').value = state.name || '';
-          document.getElementById('field-email').value = state.email || '';
-          document.getElementById('field-company').value = state.company || '';
-          document.getElementById('field-brand').value = state.brand || '';
-          document.getElementById('field-category').value = state.category || '';
-          document.getElementById('field-consent').checked = !!state.consent;
-          if (state.answers) {
-            state.answers.forEach((v, i) => { if (v !== null) selectOption(i, v); });
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.has('paid')) {
+        // This is the Stripe redirect tab — set paid flag and show success message
+        localStorage.setItem('bls_paid', '1');
+        window.history.replaceState({}, '', window.location.pathname);
+        document.getElementById('payment-success').classList.add('visible');
+
+        // If there's saved state (popup was blocked, fell back to redirect), restore it
+        const saved = localStorage.getItem('bls_state');
+        if (saved) {
+          try {
+            const state = JSON.parse(saved);
+            document.getElementById('field-name').value = state.name || '';
+            document.getElementById('field-email').value = state.email || '';
+            document.getElementById('field-company').value = state.company || '';
+            document.getElementById('field-brand').value = state.brand || '';
+            document.getElementById('field-category').value = state.category || '';
+            document.getElementById('field-consent').checked = !!state.consent;
+            if (state.answers) {
+              state.answers.forEach((v, i) => { if (v !== null) selectOption(i, v); });
+            }
+            localStorage.removeItem('bls_state');
+            document.getElementById('payment-success').classList.remove('visible');
+            buildQuiz();
+            submitQuiz();
+          } catch (e) {
+            localStorage.removeItem('bls_state');
           }
-          localStorage.removeItem('bls_state');
-          buildQuiz();
-          submitQuiz();
-        } catch (e) {
-          localStorage.removeItem('bls_state');
         }
       }
     })();
