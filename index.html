@@ -367,6 +367,8 @@
       return questions[qi].reverse ? 6 - raw : raw;
     }
 
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxd2UmjmREWY-1Mvg5SFje2ne1b13GIlUov_PMm6ce0fRa90Iv_6wdMor36MDDmmSoNiw/exec';
+
     function submitQuiz() {
       if (answers.some(a => a === null)) {
         document.getElementById('error-msg').style.display = 'block';
@@ -398,6 +400,26 @@
       }, 120);
 
       res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: avg.toFixed(2),
+          tier:  tier.label,
+          q1:  scoreFor(0, answers[0]),
+          q2:  scoreFor(1, answers[1]),
+          q3:  scoreFor(2, answers[2]),
+          q4:  scoreFor(3, answers[3]),
+          q5:  scoreFor(4, answers[4]),
+          q6:  scoreFor(5, answers[5]),
+          q7:  scoreFor(6, answers[6]),
+          q8:  scoreFor(7, answers[7]),
+          q9:  scoreFor(8, answers[8]),
+          q10: scoreFor(9, answers[9])
+        })
+      }).catch(err => console.warn('Score logging failed:', err));
     }
 
     function resetQuiz() {
