@@ -367,7 +367,7 @@
       return questions[qi].reverse ? 6 - raw : raw;
     }
 
-    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxd2UmjmREWY-1Mvg5SFje2ne1b13GIlUov_PMm6ce0fRa90Iv_6wdMor36MDDmmSoNiw/exec';
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbza4LpT_HrAfQuTxMEbvSsDPdX-W_aaC6hwmWA3AbN9HIYTP7duOzJr-M8zo_OwJrtYcg/exec';
 
     function submitQuiz() {
       if (answers.some(a => a === null)) {
@@ -404,7 +404,7 @@
       fetch(SHEET_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           score: avg.toFixed(2),
           tier:  tier.label,
