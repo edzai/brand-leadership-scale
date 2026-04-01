@@ -261,6 +261,57 @@
     /* Footer */
     .footer { text-align: center; margin-top: 4rem; font-size: 12px; color: var(--text-tertiary); letter-spacing: 0.04em; }
 
+    /* Progress */
+    .progress-wrap { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 10px 0 6px; }
+    .progress-track-top { width: 100%; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill-top { height: 100%; background: var(--bar-fill); border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+    .progress-text { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 5px; letter-spacing: 0.05em; }
+
+    /* Radar */
+    .radar-section { margin: 1.5rem auto 0.5rem; max-width: 400px; }
+    .radar-canvas { display: block; margin: 0 auto; max-width: 340px; }
+    .radar-legend { display: flex; justify-content: center; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+    .radar-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+    .radar-legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .benchmark-note { font-size: 11px; color: var(--text-tertiary); text-align: center; margin: 0.5rem auto 1.5rem; max-width: 400px; line-height: 1.5; }
+
+    /* Dimension Insights */
+    .dim-insights { display: grid; grid-template-columns: 1fr; gap: 10px; max-width: 460px; margin: 0 auto 2rem; text-align: left; }
+    .dim-insight-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; }
+    .dim-insight-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .dim-insight-name { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); font-weight: 500; }
+    .dim-insight-score { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+    .dim-insight-bar-track { width: 100%; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+    .dim-insight-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+    .dim-insight-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* Action Buttons */
+    .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 460px; margin: 0 auto 2rem; }
+    .action-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--surface); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.13s, border-color 0.13s; }
+    .action-btn:hover { background: var(--bg); border-color: var(--border-hover); }
+    .action-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Compare Table */
+    .compare-table { width: 100%; max-width: 460px; margin: 1.5rem auto 2rem; border-collapse: collapse; text-align: left; }
+    .compare-table th { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 500; }
+    .compare-table td { font-size: 14px; color: var(--text-primary); padding: 8px 10px; border-bottom: 0.5px solid var(--border); }
+    .compare-table .winner { font-weight: 600; color: var(--selected-text); }
+    .compare-heading { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); text-align: center; margin: 2rem auto 0.5rem; }
+
+    /* Print / PDF */
+    @media print {
+      body { padding: 1rem; background: #fff !important; color: #000 !important; }
+      .progress-wrap, .fields, #quiz, .submit-btn, .error-msg, .faq-section, .footer,
+      .share-section, .action-buttons, .retry-area, .header .intro { display: none !important; }
+      .result { display: block !important; }
+      .wrap { max-width: 100%; }
+      .res-score { font-size: 60px; }
+      .tier-desc, .dim-insight-text, .benchmark-note, .citation { color: #333 !important; }
+      .dim-insight-card { break-inside: avoid; }
+      .radar-canvas { max-width: 260px; }
+      .compare-table th, .compare-table td { color: #000 !important; }
+    }
+
     @media (max-width: 500px) {
       .options { gap: 4px; }
       .option { padding: 8px 2px; }
@@ -268,6 +319,10 @@
       .dim-scores { grid-template-columns: 1fr 1fr; }
       .share-buttons { flex-direction: column; align-items: stretch; }
       .share-btn { justify-content: center; }
+      .action-buttons { flex-direction: column; align-items: stretch; }
+      .action-btn { justify-content: center; }
+      .compare-table { font-size: 13px; }
+      .radar-legend { gap: 10px; }
     }
   </style>
 </head>
@@ -296,6 +351,11 @@
       </div>
     </div>
 
+    <div class="progress-wrap" id="progress-wrap" style="display:none;">
+      <div class="progress-track-top"><div class="progress-fill-top" id="progress-fill"></div></div>
+      <p class="progress-text" id="progress-text">0 of 12 answered</p>
+    </div>
+
     <main id="quiz"></main>
 
     <p class="error-msg" id="error-msg">Please complete all fields and answer every question before submitting.</p>
@@ -308,14 +368,31 @@
       <p class="res-max">out of 7.00</p>
       <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
       <div class="tier-badge" id="tier-badge"></div>
+      <div class="radar-section">
+        <canvas class="radar-canvas" id="radar-canvas" width="340" height="340"></canvas>
+        <div class="radar-legend" id="radar-legend"></div>
+      </div>
+      <p class="benchmark-note">Dashed line = scale midpoint (4.0). Scores above 5.0 indicate strong positive consumer perception relative to competitors.</p>
       <div class="dim-scores">
         <div class="dim-card"><div class="dim-card-label">Quality</div><div><span class="dim-card-score" id="d-quality">—</span><span class="dim-card-max"> / 7</span></div></div>
         <div class="dim-card"><div class="dim-card-label">Value</div><div><span class="dim-card-score" id="d-value">—</span><span class="dim-card-max"> / 7</span></div></div>
         <div class="dim-card"><div class="dim-card-label">Innovativeness</div><div><span class="dim-card-score" id="d-innov">—</span><span class="dim-card-max"> / 7</span></div></div>
         <div class="dim-card"><div class="dim-card-label">Popularity</div><div><span class="dim-card-score" id="d-pop">—</span><span class="dim-card-max"> / 7</span></div></div>
       </div>
+      <div class="dim-insights" id="dim-insights"></div>
       <p class="tier-desc" id="tier-desc"></p>
       <p class="citation">Based on: Chang, Y., &amp; Ko, Y.J. (2014). The brand leadership: Scale development and validation. <em>Journal of Brand Management, 21</em>(1), 63–80.</p>
+
+      <div class="action-buttons">
+        <button class="action-btn" onclick="downloadPDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+        <button class="action-btn" onclick="emailResults()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Email results
+        </button>
+      </div>
 
       <div class="share-section">
         <p class="share-heading">Share your result</p>
@@ -343,7 +420,11 @@
         </div>
       </div>
 
-      <button class="retry-btn" onclick="resetQuiz()">Rate another brand</button>
+      <div id="compare-table-wrap"></div>
+      <div class="retry-area" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button class="retry-btn" onclick="startCompare()">Compare with another brand</button>
+        <button class="retry-btn" onclick="resetQuiz()">Start over</button>
+      </div>
     </div>
 
     <!-- FAQ — AEO/GEO optimised -->
@@ -431,6 +512,7 @@
     ];
 
     const answers = new Array(12).fill(null);
+    let brandResults = [];
 
     function buildQuiz() {
       const container = document.getElementById('quiz');
@@ -464,6 +546,8 @@
         });
       });
       container.innerHTML = html;
+      document.getElementById('progress-wrap').style.display = 'block';
+      updateProgress();
     }
 
     function selectOption(qi, val) {
@@ -473,6 +557,7 @@
         if (el) el.classList.toggle('selected', v === val);
       }
       document.getElementById('error-msg').style.display = 'none';
+      updateProgress();
     }
 
     function dimAvg(startIdx) {
@@ -569,9 +654,12 @@
         return insight;
       }
 
-      document.getElementById('quiz').style.display        = 'none';
-      document.getElementById('submit-btn').style.display  = 'none';
-      document.getElementById('error-msg').style.display   = 'none';
+      brandResults.push({ brand, overall: parseFloat(overall), quality: qAvg, value: vAvg, innovativeness: iAvg, popularity: pAvg, tier: tier.label });
+
+      document.getElementById('quiz').style.display         = 'none';
+      document.getElementById('submit-btn').style.display   = 'none';
+      document.getElementById('error-msg').style.display    = 'none';
+      document.getElementById('progress-wrap').style.display = 'none';
 
       const res = document.getElementById('result');
       res.style.display = 'block';
@@ -642,6 +730,25 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
         document.getElementById('bar-fill').style.width = ((parseFloat(overall) / 7) * 100).toFixed(1) + '%';
       }, 120);
 
+      // Radar chart
+      const radarDS = [];
+      if (brandResults.length >= 2) {
+        const prev = brandResults[brandResults.length - 2];
+        radarDS.push({ label: prev.brand, values: [prev.quality, prev.value, prev.innovativeness, prev.popularity], fill: 'rgba(55,138,221,0.15)', stroke: 'rgba(55,138,221,0.8)' });
+      }
+      radarDS.push({ label: brand, values: [qAvg, vAvg, iAvg, pAvg], fill: brandResults.length >= 2 ? 'rgba(212,81,61,0.15)' : 'rgba(55,138,221,0.15)', stroke: brandResults.length >= 2 ? 'rgba(212,81,61,0.8)' : 'rgba(55,138,221,0.8)' });
+      drawRadar(radarDS);
+
+      // Dimension-level insights
+      buildDimInsights(brand, qAvg, vAvg, iAvg, pAvg);
+
+      // Compare table (if 2+ brands)
+      if (brandResults.length >= 2) {
+        showCompareTable(brandResults[brandResults.length - 2], brandResults[brandResults.length - 1]);
+      } else {
+        document.getElementById('compare-table-wrap').innerHTML = '';
+      }
+
       res.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       const ambient = {
@@ -698,11 +805,194 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
 
     function resetQuiz() {
       answers.fill(null);
+      brandResults = [];
       document.getElementById('result').style.display       = 'none';
       document.getElementById('quiz').style.display         = 'block';
       document.getElementById('submit-btn').style.display   = 'block';
+      document.getElementById('field-brand').value           = '';
       buildQuiz();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function startCompare() {
+      answers.fill(null);
+      document.getElementById('result').style.display       = 'none';
+      document.getElementById('quiz').style.display         = 'block';
+      document.getElementById('submit-btn').style.display   = 'block';
+      document.getElementById('field-brand').value           = '';
+      buildQuiz();
+      document.getElementById('field-brand').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateProgress() {
+      const answered = answers.filter(a => a !== null).length;
+      const pct = ((answered / 12) * 100).toFixed(1);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = answered + ' of 12 answered';
+    }
+
+    function drawRadar(datasets) {
+      const canvas = document.getElementById('radar-canvas');
+      const dpr = window.devicePixelRatio || 1;
+      const S = 340;
+      canvas.width = S * dpr;
+      canvas.height = S * dpr;
+      canvas.style.width = '100%';
+      canvas.style.maxWidth = S + 'px';
+      canvas.style.height = 'auto';
+      canvas.style.aspectRatio = '1';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const C = S / 2, R = S / 2 - 45, MX = 7, N = 4;
+      const step = (2 * Math.PI) / N, start = -Math.PI / 2;
+      const labels = ['Quality', 'Value', 'Innovativeness', 'Popularity'];
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const grid = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+      const txt = '#888780';
+
+      ctx.clearRect(0, 0, S, S);
+
+      // Grid polygons
+      for (let l = 1; l <= 7; l++) {
+        ctx.beginPath(); ctx.strokeStyle = grid; ctx.lineWidth = 0.5;
+        const r = (l / MX) * R;
+        for (let i = 0; i <= N; i++) {
+          const a = start + (i % N) * step;
+          i === 0 ? ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a)) : ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a));
+        }
+        ctx.stroke();
+      }
+      // Axes
+      for (let i = 0; i < N; i++) {
+        const a = start + i * step;
+        ctx.beginPath(); ctx.strokeStyle = grid; ctx.lineWidth = 0.5;
+        ctx.moveTo(C, C); ctx.lineTo(C + R * Math.cos(a), C + R * Math.sin(a)); ctx.stroke();
+      }
+      // Benchmark at 4.0 (midpoint)
+      ctx.beginPath(); ctx.strokeStyle = txt; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      const bR = (4 / MX) * R;
+      for (let i = 0; i <= N; i++) {
+        const a = start + (i % N) * step;
+        i === 0 ? ctx.moveTo(C + bR * Math.cos(a), C + bR * Math.sin(a)) : ctx.lineTo(C + bR * Math.cos(a), C + bR * Math.sin(a));
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+      // Scale numbers along first axis
+      ctx.fillStyle = txt; ctx.font = '9px DM Sans, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      [1, 2, 3, 4, 5, 6, 7].forEach(v => {
+        const r = (v / MX) * R;
+        ctx.fillText(v, C - 6, C - r);
+      });
+      // Data polygons
+      datasets.forEach(ds => {
+        ctx.beginPath();
+        ds.values.forEach((v, i) => { const a = start + i * step; const r = (v / MX) * R; i === 0 ? ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a)) : ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); });
+        ctx.closePath(); ctx.fillStyle = ds.fill; ctx.fill(); ctx.strokeStyle = ds.stroke; ctx.lineWidth = 2; ctx.stroke();
+        ds.values.forEach((v, i) => { const a = start + i * step; const r = (v / MX) * R; ctx.beginPath(); ctx.arc(C + r * Math.cos(a), C + r * Math.sin(a), 4, 0, 2 * Math.PI); ctx.fillStyle = ds.stroke; ctx.fill(); });
+      });
+      // Axis labels
+      ctx.fillStyle = txt; ctx.font = '12px DM Sans, sans-serif';
+      labels.forEach((lb, i) => {
+        const a = start + i * step, x = C + (R + 22) * Math.cos(a), y = C + (R + 22) * Math.sin(a);
+        ctx.textAlign = i === 1 ? 'left' : i === 3 ? 'right' : 'center';
+        ctx.textBaseline = i === 0 ? 'bottom' : i === 2 ? 'top' : 'middle';
+        ctx.fillText(lb, x, y);
+      });
+      // Legend
+      const leg = document.getElementById('radar-legend');
+      leg.innerHTML = datasets.map(d => `<span class="radar-legend-item"><span class="radar-legend-swatch" style="background:${d.stroke}"></span>${d.label}</span>`).join('')
+        + `<span class="radar-legend-item"><span class="radar-legend-swatch" style="background:transparent;border:1.5px dashed ${txt}"></span>Midpoint (4.0)</span>`;
+    }
+
+    function buildDimInsights(brand, qAvg, vAvg, iAvg, pAvg) {
+      const dims = [
+        { key: 'quality', name: 'Perceived Quality', score: qAvg },
+        { key: 'value', name: 'Perceived Value', score: vAvg },
+        { key: 'innovativeness', name: 'Perceived Innovativeness', score: iAvg },
+        { key: 'popularity', name: 'Perceived Popularity', score: pAvg }
+      ];
+      const sorted = [...dims].sort((a, b) => b.score - a.score);
+      const best = sorted[0].key, worst = sorted[sorted.length - 1].key;
+      const container = document.getElementById('dim-insights');
+      let html = '';
+      dims.forEach(d => {
+        const pct = ((d.score / 7) * 100).toFixed(1);
+        const clr = d.score >= 5.5 ? '#378ADD' : d.score >= 4.0 ? '#97C459' : d.score >= 2.5 ? '#E4A832' : '#D4513D';
+        let t = '';
+        if (d.key === 'quality') {
+          t = d.score >= 5.5 ? `${brand}'s quality perception (${d.score.toFixed(2)}) is a clear competitive advantage. Maintain this through consistent product standards and visible quality signals.`
+            : d.score >= 4.0 ? `${brand}'s quality perception (${d.score.toFixed(2)}) is solid but not yet a differentiator. Invest in premium cues — materials, certifications, or packaging — that consumers notice before purchase.`
+            : `Quality perception (${d.score.toFixed(2)}) is a vulnerability for ${brand}. Prioritise product improvements and amplify through reviews, guarantees, and endorsements.`;
+        } else if (d.key === 'value') {
+          t = d.score >= 5.5 ? `${brand} delivers strong perceived value (${d.score.toFixed(2)}) — consumers feel they get more than they pay for. This drives repeat purchase and advocacy.`
+            : d.score >= 4.0 ? `${brand}'s value perception (${d.score.toFixed(2)}) is adequate but won't win price-sensitive segments. Consider bundling, loyalty rewards, or feature upgrades at the same price.`
+            : `Consumers don't see ${brand} as good value (${d.score.toFixed(2)}). Either reposition pricing or communicate benefits more clearly relative to cost.`;
+        } else if (d.key === 'innovativeness') {
+          t = d.score >= 5.5 ? `${brand} is perceived as an innovator and trendsetter (${d.score.toFixed(2)}). Leverage this with first-to-market launches and thought leadership.`
+            : d.score >= 4.0 ? `${brand} is seen as reasonably innovative (${d.score.toFixed(2)}) but not a trendsetter. Increase visibility of new features or creative campaigns to build an innovation narrative.`
+            : `Consumers view ${brand} as behind on innovation (${d.score.toFixed(2)}). Signal change through visible product updates, creative partnerships, or bold marketing moves.`;
+        } else {
+          t = d.score >= 5.5 ? `${brand} has strong brand awareness and preference (${d.score.toFixed(2)}). This popularity creates social proof — leverage it in marketing and distribution.`
+            : d.score >= 4.0 ? `${brand} has moderate awareness (${d.score.toFixed(2)}) but isn't top-of-mind. Invest in reach — broader distribution, social presence, or partnerships with wider audiences.`
+            : `${brand} has low consumer awareness (${d.score.toFixed(2)}). Focus on recognition through consistent branding, increased touchpoints, and leveraging existing strengths.`;
+        }
+        if (d.key === best) t += ` This is ${brand}'s strongest dimension.`;
+        if (d.key === worst) t += ` This is the biggest opportunity for improvement.`;
+        html += `<div class="dim-insight-card">
+          <div class="dim-insight-header"><span class="dim-insight-name">${d.name}</span><span class="dim-insight-score">${d.score.toFixed(2)} / 7</span></div>
+          <div class="dim-insight-bar-track"><div class="dim-insight-bar-fill" style="width:${pct}%;background:${clr}"></div></div>
+          <p class="dim-insight-text">${t}</p>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function showCompareTable(a, b) {
+      const keys = ['quality', 'value', 'innovativeness', 'popularity'];
+      const labels = ['Quality', 'Value', 'Innovativeness', 'Popularity'];
+      let html = `<p class="compare-heading">Brand Comparison</p><table class="compare-table"><thead><tr><th>Dimension</th><th>${a.brand}</th><th>${b.brand}</th><th>Diff</th></tr></thead><tbody>`;
+      keys.forEach((k, i) => {
+        const av = a[k], bv = b[k], diff = (bv - av).toFixed(2);
+        html += `<tr><td>${labels[i]}</td><td class="${av > bv ? 'winner' : ''}">${av.toFixed(2)}</td><td class="${bv > av ? 'winner' : ''}">${bv.toFixed(2)}</td><td>${diff > 0 ? '+' : ''}${diff}</td></tr>`;
+      });
+      const od = (b.overall - a.overall).toFixed(2);
+      html += `<tr style="font-weight:600"><td>Overall</td><td class="${a.overall > b.overall ? 'winner' : ''}">${a.overall.toFixed(2)}</td><td class="${b.overall > a.overall ? 'winner' : ''}">${b.overall.toFixed(2)}</td><td>${od > 0 ? '+' : ''}${od}</td></tr>`;
+      html += `</tbody></table>`;
+      document.getElementById('compare-table-wrap').innerHTML = html;
+    }
+
+    function downloadPDF() {
+      window.print();
+    }
+
+    function emailResults() {
+      const brand = document.getElementById('res-brand-name').textContent;
+      const score = document.getElementById('res-score').textContent;
+      const tier = document.getElementById('tier-badge').textContent;
+      const q = document.getElementById('d-quality').textContent;
+      const v = document.getElementById('d-value').textContent;
+      const inn = document.getElementById('d-innov').textContent;
+      const p = document.getElementById('d-pop').textContent;
+      const insight = document.getElementById('tier-desc').textContent;
+      const subject = encodeURIComponent('Brand Leadership Score: ' + brand + ' \u2014 ' + score + '/7 (' + tier + ')');
+      const body = encodeURIComponent(
+        'Brand Leadership Scale Results\n' +
+        '==============================\n\n' +
+        'Brand: ' + brand + '\n' +
+        'Overall Score: ' + score + ' / 7\n' +
+        'Tier: ' + tier + '\n\n' +
+        'Dimension Scores:\n' +
+        '- Perceived Quality: ' + q + ' / 7\n' +
+        '- Perceived Value: ' + v + ' / 7\n' +
+        '- Perceived Innovativeness: ' + inn + ' / 7\n' +
+        '- Perceived Popularity: ' + p + ' / 7\n\n' +
+        'Insight:\n' + insight + '\n\n' +
+        '---\n' +
+        'Based on: Chang, Y., & Ko, Y.J. (2014). The brand leadership: Scale development and validation. Journal of Brand Management, 21(1), 63-80.\n' +
+        'Take the assessment: https://acalytica.com/brand-leadership-scale/'
+      );
+      window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
     }
 
     buildQuiz();
