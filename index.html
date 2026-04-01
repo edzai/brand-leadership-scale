@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brand Leadership Scale</title>
-  <meta name="description" content="Discover your brand leadership orientation with this 10-question self-assessment." />
+  <meta name="description" content="Measure a brand's leadership across quality, value, innovativeness and popularity — based on Chang & Ko (2014)." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
@@ -54,202 +54,79 @@
       padding: 3rem 1.25rem 5rem;
     }
 
-    .wrap {
-      max-width: 660px;
-      margin: 0 auto;
-    }
+    .wrap { max-width: 660px; margin: 0 auto; }
 
-    /* Header */
     .header { text-align: center; margin-bottom: 3rem; }
-    .kicker {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-tertiary);
-      margin-bottom: 1rem;
-    }
-    .title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(28px, 5vw, 40px);
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.2;
-      margin-bottom: 1rem;
-    }
-    .divider {
-      width: 40px;
-      height: 2px;
-      background: var(--text-primary);
-      opacity: 0.15;
-      margin: 1.25rem auto;
-    }
-    .intro {
-      font-size: 15px;
-      color: var(--text-secondary);
-      line-height: 1.75;
-      max-width: 520px;
-      margin: 0 auto;
-    }
+    .kicker { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 1rem; }
+    .title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(28px, 5vw, 40px); font-weight: 600; color: var(--text-primary); line-height: 1.2; margin-bottom: 1rem; }
+    .divider { width: 40px; height: 2px; background: var(--text-primary); opacity: 0.15; margin: 1.25rem auto; }
+    .intro { font-size: 15px; color: var(--text-secondary); line-height: 1.75; max-width: 520px; margin: 0 auto; }
+
+    /* Fields */
+    .fields { margin-bottom: 2.5rem; padding-bottom: 2.5rem; border-bottom: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 14px; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); }
+    .field-input { width: 100%; padding: 11px 14px; background: var(--surface); color: var(--text-primary); border: 0.5px solid var(--border); border-radius: var(--radius-md); font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 0.15s; }
+    .field-input:focus { border-color: var(--selected-dot); }
+    .field-input::placeholder { color: var(--text-tertiary); }
+
+    /* Dimension heading */
+    .dimension-heading { margin: 2.5rem 0 1.5rem; padding-bottom: 0.75rem; border-bottom: 0.5px solid var(--border); }
+    .dimension-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-tertiary); }
+    .dimension-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--text-primary); margin-top: 0.2rem; }
+    .dimension-def { font-size: 13px; color: var(--text-tertiary); line-height: 1.5; margin-top: 0.4rem; font-style: italic; }
+
+    /* Stem */
+    .stem { font-size: 14px; color: var(--text-secondary); background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 1.5rem; line-height: 1.6; }
+    .stem strong { color: var(--text-primary); font-weight: 500; }
 
     /* Questions */
-    .question {
-      margin-bottom: 2.25rem;
-      padding-bottom: 2.25rem;
-      border-bottom: 0.5px solid var(--border);
-    }
+    .question { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 0.5px solid var(--border); }
     .question:last-of-type { border-bottom: none; }
+    .q-num { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem; }
+    .q-text { font-size: 17px; font-weight: 500; color: var(--text-primary); line-height: 1.55; margin-bottom: 1.25rem; }
 
-    .q-num {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-tertiary);
-      margin-bottom: 0.5rem;
-    }
-    .q-text {
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--text-primary);
-      line-height: 1.55;
-      margin-bottom: 1.25rem;
-    }
-
-    .options { display: flex; flex-direction: column; gap: 7px; }
-
-    .option {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      padding: 11px 15px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border);
-      background: var(--surface);
-      cursor: pointer;
-      transition: background 0.13s, border-color 0.13s;
-      user-select: none;
-    }
+    .options { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .option { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border-radius: var(--radius-md); border: 0.5px solid var(--border); background: var(--surface); cursor: pointer; transition: background 0.13s, border-color 0.13s; user-select: none; }
     .option:hover { border-color: var(--border-hover); background: var(--bg); }
-    .option.selected {
-      background: var(--selected-bg);
-      border-color: var(--selected-border);
-    }
+    .option.selected { background: var(--selected-bg); border-color: var(--selected-border); }
     .option.selected .radio { background: var(--selected-dot); border-color: var(--selected-dot); }
-    .option.selected .opt-label { color: var(--selected-text); font-weight: 500; }
-
-    .radio {
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border-hover);
-      flex-shrink: 0;
-      transition: background 0.13s, border-color 0.13s;
-    }
-    .opt-label { font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
+    .option.selected .opt-num { color: var(--selected-text); font-weight: 500; }
+    .radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border-hover); flex-shrink: 0; transition: background 0.13s, border-color 0.13s; }
+    .opt-num { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+    .scale-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+    .scale-label { font-size: 11px; color: var(--text-tertiary); }
 
     /* Submit */
-    .submit-btn {
-      display: block;
-      width: 100%;
-      margin-top: 2.5rem;
-      padding: 15px;
-      background: var(--text-primary);
-      color: var(--bg);
-      border: none;
-      border-radius: var(--radius-md);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
+    .submit-btn { display: block; width: 100%; margin-top: 2.5rem; padding: 15px; background: var(--text-primary); color: var(--bg); border: none; border-radius: var(--radius-md); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0.04em; cursor: pointer; transition: opacity 0.2s; }
     .submit-btn:hover { opacity: 0.78; }
-
-    .error-msg {
-      display: none;
-      margin-top: 1rem;
-      text-align: center;
-      font-size: 13px;
-      color: #A32D2D;
-    }
+    .error-msg { display: none; margin-top: 1rem; text-align: center; font-size: 13px; color: #A32D2D; }
 
     /* Result */
-    .result {
-      display: none;
-      text-align: center;
-      padding: 3rem 1.5rem 2rem;
-    }
-    .res-label {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-tertiary);
-      margin-bottom: 1rem;
-    }
-    .res-score {
-      font-family: 'Playfair Display', serif;
-      font-size: 80px;
-      font-weight: 400;
-      color: var(--text-primary);
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-    .res-max {
-      font-size: 14px;
-      color: var(--text-tertiary);
-      margin-bottom: 1.75rem;
-    }
-    .bar-track {
-      width: 100%;
-      max-width: 340px;
-      height: 5px;
-      background: var(--border);
-      border-radius: 3px;
-      margin: 0 auto 2rem;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: var(--bar-fill);
-      width: 0%;
-      transition: width 0.9s cubic-bezier(.4,0,.2,1);
-    }
-    .tier-badge {
-      display: inline-block;
-      padding: 7px 20px;
-      border-radius: 100px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 1.5rem;
-    }
-    .tier-desc {
-      font-size: 15px;
-      line-height: 1.75;
-      color: var(--text-secondary);
-      max-width: 460px;
-      margin: 0 auto 2.5rem;
-    }
-    .retry-btn {
-      background: none;
-      border: 0.5px solid var(--border-hover);
-      color: var(--text-primary);
-      padding: 11px 26px;
-      border-radius: var(--radius-md);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
+    .result { display: none; text-align: center; padding: 3rem 1.5rem 2rem; }
+    .res-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 1rem; }
+    .res-score { font-family: 'Playfair Display', serif; font-size: 80px; font-weight: 400; color: var(--text-primary); line-height: 1; margin-bottom: 0.25rem; }
+    .res-max { font-size: 14px; color: var(--text-tertiary); margin-bottom: 1.75rem; }
+    .bar-track { width: 100%; max-width: 340px; height: 5px; background: var(--border); border-radius: 3px; margin: 0 auto 2rem; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; background: var(--bar-fill); width: 0%; transition: width 0.9s cubic-bezier(.4,0,.2,1); }
+    .tier-badge { display: inline-block; padding: 7px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; margin-bottom: 1.5rem; }
+    .dim-scores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 400px; margin: 0 auto 2rem; text-align: left; }
+    .dim-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; }
+    .dim-card-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px; }
+    .dim-card-score { font-size: 22px; font-weight: 500; color: var(--text-primary); }
+    .dim-card-max { font-size: 12px; color: var(--text-tertiary); }
+    .tier-desc { font-size: 15px; line-height: 1.75; color: var(--text-secondary); max-width: 460px; margin: 0 auto 0.75rem; }
+    .citation { font-size: 12px; color: var(--text-tertiary); max-width: 460px; margin: 0 auto 2.5rem; font-style: italic; }
+    .retry-btn { background: none; border: 0.5px solid var(--border-hover); color: var(--text-primary); padding: 11px 26px; border-radius: var(--radius-md); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: background 0.15s; }
     .retry-btn:hover { background: var(--border); }
 
-    /* Footer */
-    .footer {
-      text-align: center;
-      margin-top: 4rem;
-      font-size: 12px;
-      color: var(--text-tertiary);
-      letter-spacing: 0.04em;
+    .footer { text-align: center; margin-top: 4rem; font-size: 12px; color: var(--text-tertiary); letter-spacing: 0.04em; }
+
+    @media (max-width: 500px) {
+      .options { grid-template-columns: repeat(7, 1fr); gap: 4px; }
+      .option { padding: 8px 2px; }
+      .opt-num { font-size: 12px; }
+      .dim-scores { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -257,25 +134,47 @@
   <div class="wrap">
 
     <header class="header">
-      <p class="kicker">Self-Assessment</p>
+      <p class="kicker">Consumer Perception Assessment</p>
       <h1 class="title">Brand Leadership Scale</h1>
       <div class="divider"></div>
-      <p class="intro">Below are ten statements about how you lead your brand. There are no right or wrong answers — answer honestly based on how you genuinely think and act. At the end, you will receive a score reflecting your brand leadership orientation.</p>
+      <p class="intro">Rate a brand of your choice across 12 statements covering quality, value, innovativeness and popularity. Compare it against other competing brands in its category using the 7-point scale below.</p>
     </header>
+
+    <div class="fields">
+      <div class="field-group">
+        <label class="field-label" for="field-name">Your name</label>
+        <input class="field-input" type="text" id="field-name" placeholder="e.g. Jane Smith" autocomplete="name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="field-email">Email address</label>
+        <input class="field-input" type="email" id="field-email" placeholder="e.g. jane@company.com" autocomplete="email" />
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="field-brand">Brand you are rating</label>
+        <input class="field-input" type="text" id="field-brand" placeholder="e.g. Apple, Nike, Coca-Cola…" />
+      </div>
+    </div>
 
     <div id="quiz"></div>
 
-    <p class="error-msg" id="error-msg">Please answer all questions before submitting.</p>
+    <p class="error-msg" id="error-msg">Please complete all fields and answer every question before submitting.</p>
     <button class="submit-btn" id="submit-btn" onclick="submitQuiz()">Get Your Score</button>
 
     <div class="result" id="result">
-      <p class="res-label">Your Brand Leadership Score</p>
+      <p class="res-label">Overall Brand Leadership Score</p>
       <p class="res-score" id="res-score">—</p>
-      <p class="res-max">out of 5.00</p>
+      <p class="res-max">out of 7.00</p>
       <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
       <div class="tier-badge" id="tier-badge"></div>
+      <div class="dim-scores">
+        <div class="dim-card"><div class="dim-card-label">Quality</div><div><span class="dim-card-score" id="d-quality">—</span><span class="dim-card-max"> / 7</span></div></div>
+        <div class="dim-card"><div class="dim-card-label">Value</div><div><span class="dim-card-score" id="d-value">—</span><span class="dim-card-max"> / 7</span></div></div>
+        <div class="dim-card"><div class="dim-card-label">Innovativeness</div><div><span class="dim-card-score" id="d-innov">—</span><span class="dim-card-max"> / 7</span></div></div>
+        <div class="dim-card"><div class="dim-card-label">Popularity</div><div><span class="dim-card-score" id="d-pop">—</span><span class="dim-card-max"> / 7</span></div></div>
+      </div>
       <p class="tier-desc" id="tier-desc"></p>
-      <button class="retry-btn" onclick="resetQuiz()">Retake the assessment</button>
+      <p class="citation">Based on: Chang, Y., &amp; Ko, Y.J. (2014). The brand leadership: Scale development and validation. <em>Journal of Brand Management, 21</em>(1), 63–80.</p>
+      <button class="retry-btn" onclick="resetQuiz()">Rate another brand</button>
     </div>
 
     <footer class="footer">
@@ -285,100 +184,132 @@
   </div>
 
   <script>
-    const questions = [
-      { text: "I can articulate my brand's vision clearly and compellingly in a single sentence.", reverse: false },
-      { text: "Under business pressure, I sometimes compromise on brand values to achieve short-term results.", reverse: true },
-      { text: "Every significant decision I make, I consider how it reflects on and reinforces the brand.", reverse: false },
-      { text: "I struggle to explain what makes my brand genuinely distinct from its competitors.", reverse: true },
-      { text: "I actively work to align my team around a shared brand promise.", reverse: false },
-      { text: "My brand's personality is consistent across all channels and customer touchpoints.", reverse: false },
-      { text: "I find it difficult to say no to opportunities that don't fit the brand's direction.", reverse: true },
-      { text: "I invest time in understanding the emotional relationship customers have with my brand.", reverse: false },
-      { text: "When facing uncertainty or change, I use the brand as a compass to guide decisions.", reverse: false },
-      { text: "I can clearly describe the future I want my brand to create in the world.", reverse: false }
-    ];
-
-    const labels = [
-      "Very much like me",
-      "Mostly like me",
-      "Somewhat like me",
-      "Not much like me",
-      "Not like me at all"
-    ];
-
-    const tiers = [
+    const dimensions = [
       {
-        min: 4.1,
-        label: "Brand Visionary",
-        bg: "#E6F1FB", color: "#0C447C",
-        desc: "You lead with exceptional brand clarity and conviction. Your brand is a living compass that shapes strategy, culture, and every decision you make."
+        key: 'quality',
+        name: 'Perceived Quality',
+        def: 'Consumers\u2019 judgment about a product\u2019s relative superiority in a market.',
+        items: [
+          'Is higher in quality standards',
+          'Is superior in quality standards',
+          'Offers higher quality product/service features'
+        ]
       },
       {
-        min: 3.1,
-        label: "Brand Champion",
-        bg: "#EAF3DE", color: "#27500A",
-        desc: "You have a strong brand orientation and consistently advocate for your brand's values. With sharper focus on differentiation, you're close to visionary leadership."
+        key: 'value',
+        name: 'Perceived Value',
+        def: 'Consumers\u2019 evaluation of a product\u2019s relative financial value based on what they give and receive.',
+        items: [
+          'Is reasonably priced',
+          'Has better product/service features for the price',
+          'Offers more benefits for the price'
+        ]
       },
       {
-        min: 2.1,
-        label: "Brand Builder",
-        bg: "#FAEEDA", color: "#633806",
-        desc: "You understand the importance of brand and are building the foundations. Investing in brand clarity and consistency will significantly amplify your impact."
+        key: 'innovativeness',
+        name: 'Perceived Innovativeness',
+        def: 'Consumers\u2019 perception about a brand\u2019s relative capability to be open to innovative ideas and work on new solutions.',
+        items: [
+          'Is more dynamic in improvements',
+          'Is more creative in products and services',
+          'Is more of a trendsetter'
+        ]
       },
       {
-        min: 0,
-        label: "Brand Explorer",
-        bg: "#FAECE7", color: "#711B0C",
-        desc: "You are at the beginning of your brand leadership journey. Developing a clear brand vision and learning to embed it in daily decisions will be transformative."
+        key: 'popularity',
+        name: 'Perceived Popularity',
+        def: 'Consumers\u2019 perception about a brand\u2019s relative popularity reflected by brand awareness and consumption.',
+        items: [
+          'Is more preferred by consumers',
+          'Is more recognised by consumers',
+          'Is better known among consumers'
+        ]
       }
     ];
 
-    const answers = new Array(questions.length).fill(null);
+    const tiers = [
+      { min: 5.5, label: 'Brand Leader',    bg: '#E6F1FB', color: '#0C447C', desc: 'This brand scores exceptionally high across quality, value, innovativeness and popularity \u2014 a clear leader in its category that sets the standard for competitors.' },
+      { min: 4.0, label: 'Brand Contender', bg: '#EAF3DE', color: '#27500A', desc: 'This brand performs strongly on the four dimensions of brand leadership. With targeted improvements, it has the potential to reach full leadership status.' },
+      { min: 2.5, label: 'Brand Challenger', bg: '#FAEEDA', color: '#633806', desc: 'This brand shows moderate brand leadership. There are clear opportunities to strengthen its competitive position across one or more dimensions.' },
+      { min: 0,   label: 'Brand Follower',  bg: '#FAECE7', color: '#711B0C', desc: 'This brand scores below the midpoint on brand leadership dimensions. Significant investment in quality, value, innovation or awareness would be needed to lead in its category.' }
+    ];
+
+    const answers = new Array(12).fill(null);
 
     function buildQuiz() {
       const container = document.getElementById('quiz');
-      container.innerHTML = questions.map((q, qi) => `
-        <div class="question" id="q-${qi}">
-          <p class="q-num">${qi + 1} of ${questions.length}</p>
-          <p class="q-text">${q.text}</p>
-          <div class="options">
-            ${labels.map((l, li) => `
-              <div class="option" id="opt-${qi}-${li}" onclick="selectOption(${qi},${li})">
-                <div class="radio" id="radio-${qi}-${li}"></div>
-                <span class="opt-label">${l}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
+      let html = '';
+      let qi = 0;
+      dimensions.forEach((dim, di) => {
+        html += `<div class="dimension-heading">
+          <p class="dimension-label">Dimension ${di + 1} of 4</p>
+          <p class="dimension-name">${dim.name}</p>
+          <p class="dimension-def">${dim.def}</p>
+        </div>`;
+        const brand = document.getElementById('field-brand')?.value.trim() || 'this brand';
+        html += `<div class="stem">When compared with other competing brands in its category, <strong>${brand}</strong>:</div>`;
+        dim.items.forEach((item, ii) => {
+          html += `<div class="question" id="q-${qi}">
+            <p class="q-num">Question ${qi + 1} of 12</p>
+            <p class="q-text">${item}</p>
+            <div class="options">
+              ${[1,2,3,4,5,6,7].map(v => `
+                <div class="option" id="opt-${qi}-${v}" onclick="selectOption(${qi},${v})">
+                  <div class="radio" id="radio-${qi}-${v}"></div>
+                  <span class="opt-num">${v}</span>
+                </div>`).join('')}
+            </div>
+            <div class="scale-labels">
+              <span class="scale-label">Strongly disagree</span>
+              <span class="scale-label">Strongly agree</span>
+            </div>
+          </div>`;
+          qi++;
+        });
+      });
+      container.innerHTML = html;
     }
 
-    function selectOption(qi, oi) {
-      answers[qi] = oi;
-      for (let i = 0; i < labels.length; i++) {
-        const el = document.getElementById(`opt-${qi}-${i}`);
-        if (el) el.classList.toggle('selected', i === oi);
+    function selectOption(qi, val) {
+      answers[qi] = val;
+      for (let v = 1; v <= 7; v++) {
+        const el = document.getElementById(`opt-${qi}-${v}`);
+        if (el) el.classList.toggle('selected', v === val);
       }
       document.getElementById('error-msg').style.display = 'none';
     }
 
-    function scoreFor(qi, oi) {
-      const raw = 5 - oi;
-      return questions[qi].reverse ? 6 - raw : raw;
+    function dimAvg(startIdx) {
+      const vals = answers.slice(startIdx, startIdx + 3);
+      return vals.reduce((s, v) => s + v, 0) / 3;
     }
 
-    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbza4LpT_HrAfQuTxMEbvSsDPdX-W_aaC6hwmWA3AbN9HIYTP7duOzJr-M8zo_OwJrtYcg/exec';
-
     function submitQuiz() {
+      const name  = document.getElementById('field-name').value.trim();
+      const email = document.getElementById('field-email').value.trim();
+      const brand = document.getElementById('field-brand').value.trim();
+      const errEl = document.getElementById('error-msg');
+
+      if (!name || !email || !brand) {
+        errEl.textContent = 'Please enter your name, email and the brand you are rating.';
+        errEl.style.display = 'block';
+        document.getElementById('field-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
       if (answers.some(a => a === null)) {
-        document.getElementById('error-msg').style.display = 'block';
+        errEl.textContent = 'Please answer all 12 questions before submitting.';
+        errEl.style.display = 'block';
         const first = answers.findIndex(a => a === null);
         document.getElementById(`q-${first}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      const total = answers.reduce((s, oi, qi) => s + scoreFor(qi, oi), 0);
-      const avg = total / questions.length;
-      const tier = tiers.find(t => avg >= t.min);
+
+      const qAvg  = dimAvg(0);
+      const vAvg  = dimAvg(3);
+      const iAvg  = dimAvg(6);
+      const pAvg  = dimAvg(9);
+      const overall = (qAvg + vAvg + iAvg + pAvg) / 4;
+      const tier = tiers.find(t => overall >= t.min);
 
       document.getElementById('quiz').style.display = 'none';
       document.getElementById('submit-btn').style.display = 'none';
@@ -386,7 +317,11 @@
 
       const res = document.getElementById('result');
       res.style.display = 'block';
-      document.getElementById('res-score').textContent = avg.toFixed(2);
+      document.getElementById('res-score').textContent = overall.toFixed(2);
+      document.getElementById('d-quality').textContent = qAvg.toFixed(2);
+      document.getElementById('d-value').textContent   = vAvg.toFixed(2);
+      document.getElementById('d-innov').textContent   = iAvg.toFixed(2);
+      document.getElementById('d-pop').textContent     = pAvg.toFixed(2);
 
       const badge = document.getElementById('tier-badge');
       badge.textContent = tier.label;
@@ -396,28 +331,28 @@
       document.getElementById('tier-desc').textContent = tier.desc;
 
       setTimeout(() => {
-        document.getElementById('bar-fill').style.width = ((avg / 5) * 100).toFixed(1) + '%';
+        document.getElementById('bar-fill').style.width = ((overall / 7) * 100).toFixed(1) + '%';
       }, 120);
 
       res.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+      const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwS_aC8xSO_chT3_q99vs9mU28gJzirpvJK_sD_gaVO3zVhgTqdkOm5qfrvFCPJ97ie0A/exec';
       fetch(SHEET_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          score: avg.toFixed(2),
-          tier:  tier.label,
-          q1:  scoreFor(0, answers[0]),
-          q2:  scoreFor(1, answers[1]),
-          q3:  scoreFor(2, answers[2]),
-          q4:  scoreFor(3, answers[3]),
-          q5:  scoreFor(4, answers[4]),
-          q6:  scoreFor(5, answers[5]),
-          q7:  scoreFor(6, answers[6]),
-          q8:  scoreFor(7, answers[7]),
-          q9:  scoreFor(8, answers[8]),
-          q10: scoreFor(9, answers[9])
+          name, email, brand,
+          overall: overall.toFixed(2),
+          tier: tier.label,
+          quality: qAvg.toFixed(2),
+          value: vAvg.toFixed(2),
+          innovativeness: iAvg.toFixed(2),
+          popularity: pAvg.toFixed(2),
+          q1: answers[0],  q2: answers[1],  q3: answers[2],
+          q4: answers[3],  q5: answers[4],  q6: answers[5],
+          q7: answers[6],  q8: answers[7],  q9: answers[8],
+          q10: answers[9], q11: answers[10], q12: answers[11]
         })
       }).catch(err => console.warn('Score logging failed:', err));
     }
