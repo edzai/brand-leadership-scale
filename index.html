@@ -505,10 +505,10 @@
     ];
 
     const tiers = [
-      { min: 5.5, label: 'Brand Leader',     bg: '#E6F1FB', color: '#0C447C', desc: 'This brand scores exceptionally high across quality, value, innovativeness and popularity \u2014 a clear leader in its category that sets the standard for competitors.' },
-      { min: 4.0, label: 'Brand Contender',  bg: '#EAF3DE', color: '#27500A', desc: 'This brand performs strongly on the four dimensions of brand leadership. With targeted improvements, it has the potential to reach full leadership status.' },
-      { min: 2.5, label: 'Brand Challenger', bg: '#FAEEDA', color: '#633806', desc: 'This brand shows moderate brand leadership. There are clear opportunities to strengthen its competitive position across one or more dimensions.' },
-      { min: 0,   label: 'Brand Follower',   bg: '#FAECE7', color: '#711B0C', desc: 'This brand scores below the midpoint on brand leadership dimensions. Significant investment in quality, value, innovation or awareness would be needed to lead in its category.' }
+      { min: 5.5, label: 'Brand Leader',     bg: '#E6F1FB', color: '#0C447C', desc: 'You see this brand as a clear leader — scoring exceptionally high across quality, value, innovativeness and popularity compared to its competitors.' },
+      { min: 4.0, label: 'Brand Contender',  bg: '#EAF3DE', color: '#27500A', desc: 'You rate this brand as a strong contender. Your scores suggest it performs well across the four dimensions, though it hasn\u2019t reached leadership level in your eyes.' },
+      { min: 2.5, label: 'Brand Challenger', bg: '#FAEEDA', color: '#633806', desc: 'Your ratings place this brand in the middle of the pack. You see room for it to improve across one or more dimensions relative to its competitors.' },
+      { min: 0,   label: 'Brand Follower',   bg: '#FAECE7', color: '#711B0C', desc: 'Your ratings suggest this brand falls behind its competitors. You don\u2019t currently see it as strong on quality, value, innovativeness or popularity.' }
     ];
 
     const answers = new Array(12).fill(null);
@@ -655,25 +655,27 @@
         const above = dimScores.filter(d => d.score >= 5.5).map(d => d.name);
         const below = dimScores.filter(d => d.score < 4.0).map(d => d.name);
 
-        let insight = `${brand} scored ${overall}/7 overall. Its strongest dimension is ${strongest.name} at ${strongest.score.toFixed(2)}, while ${weakest.name} is the weakest at ${weakest.score.toFixed(2)} — a gap of ${gap} points.`;
+        let insight = `You gave ${brand} an overall score of ${overall}/7. You rated it highest on ${strongest.name} (${strongest.score.toFixed(2)}) and lowest on ${weakest.name} (${weakest.score.toFixed(2)}) — a gap of ${gap} points between the two.`;
 
         if (parseFloat(overall) >= 5.5) {
-          insight += ` ${brand} demonstrates clear leadership across all four dimensions.`;
+          insight += ` Your ratings place ${brand} as a clear leader — you see it outperforming competitors across all four dimensions.`;
           if (weakest.score < 5.5) {
-            insight += ` Closing the gap on ${weakest.name} would solidify its dominant position and make it harder for competitors to challenge.`;
+            insight += ` The only area where your perception dips slightly is ${weakest.name}, though it still scores well above the midpoint.`;
           }
         } else if (parseFloat(overall) >= 4.0) {
-          insight += ` To move from contender to leader, ${brand} should prioritise improving ${weakest.name}${below.length > 0 ? ', which currently falls below the competitive midpoint' : ''}.`;
-          if (above.length > 0) {
-            insight += ` Its strength in ${above.join(' and ')} provides a solid foundation to build from.`;
+          insight += ` Your ratings suggest you see ${brand} as a strong contender, but not yet a category leader.`;
+          if (below.length > 0) {
+            insight += ` Notably, you rated its ${below.join(' and ')} below the competitive midpoint — areas where ${brand} falls short of your expectations.`;
+          } else if (above.length > 0) {
+            insight += ` You do see real strength in its ${above.join(' and ')}, which you rated at leadership level.`;
           }
         } else if (parseFloat(overall) >= 2.5) {
-          insight += ` ${brand} has room to grow — focusing on ${weakest.name} would have the most immediate impact on overall brand perception.`;
+          insight += ` Your scores indicate mixed perceptions — you see ${brand} as neither leading nor trailing in its category.`;
           if (strongest.score >= 4.0) {
-            insight += ` Its relatively strong ${strongest.name} score (${strongest.score.toFixed(2)}) shows it can compete; applying the same rigour to weaker dimensions would shift its competitive position.`;
+            insight += ` You do rate its ${strongest.name} relatively well (${strongest.score.toFixed(2)}), suggesting ${brand} has some competitive strength in your eyes, even if other areas lag behind.`;
           }
         } else {
-          insight += ` ${brand} currently trails competitors across most dimensions. A focused strategy starting with ${strongest.name} — its relative bright spot — could build momentum before tackling gaps in ${weakest.name}.`;
+          insight += ` Your ratings suggest you see ${brand} as significantly behind its competitors across most dimensions. Even its relative strength in ${strongest.name} falls below the midpoint of the scale.`;
         }
 
         return insight;
@@ -709,7 +711,7 @@
       // AI-generated insight via Anthropic API
       (async () => {
         try {
-          const prompt = `You are a brand strategy expert with access to web search. A consumer has just rated the brand "${brand}" using the validated Brand Leadership Scale (Chang & Ko, 2014).
+          const prompt = `You are a brand perception analyst speaking directly to a consumer who just completed a brand survey. They rated the brand "${brand}" using the validated Brand Leadership Scale (Chang & Ko, 2014).
 
 Their scores (out of 7):
 - Overall: ${overall}
@@ -719,11 +721,11 @@ Their scores (out of 7):
 - Perceived Popularity: ${pAvg.toFixed(2)}
 - Tier: ${tier.label}
 
-First, use web search to find how ${brand}'s key competitors are currently perceived in terms of brand quality, value, innovation and popularity — look for recent brand rankings, consumer perception studies, or brand equity reports. Then write 3–4 sentences of sharp, specific brand strategy insight that:
-1. Identifies ${brand}'s strongest and weakest dimension from the scores above
-2. Compares this pattern to what competitors are doing right now — name specific rivals and their relative position
-3. Creates a sense of urgency: what is ${brand} at risk of losing, or what opportunity is it missing, given what competitors are doing
-Be direct, specific and commercially sharp. Reference real competitor names and the actual scores. No bullet points. No generic phrases.`;
+First, use web search to find how ${brand}'s key competitors are currently positioned in the market — look for recent brand rankings, consumer perception studies, or brand equity reports. Then write 3–4 sentences addressed directly to the respondent (use "you" / "your") that:
+1. Reflect back their strongest and weakest perception of ${brand} based on the scores
+2. Put their perception in context — how does their view compare to how ${brand} and its competitors are generally perceived in the market? Name specific rivals.
+3. Highlight what's interesting or notable about their perception pattern — do they see something the market broadly agrees with, or do they diverge from the consensus?
+Be conversational, specific, and insightful. Reference the actual scores and real competitor names. Address the respondent directly. No bullet points. No generic phrases.`;
 
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 15000);
@@ -950,24 +952,24 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
         const clr = d.score >= 5.5 ? '#378ADD' : d.score >= 4.0 ? '#97C459' : d.score >= 2.5 ? '#E4A832' : '#D4513D';
         let t = '';
         if (d.key === 'quality') {
-          t = d.score >= 5.5 ? `${brand}'s quality perception (${d.score.toFixed(2)}) is a clear competitive advantage. Maintain this through consistent product standards and visible quality signals.`
-            : d.score >= 4.0 ? `${brand}'s quality perception (${d.score.toFixed(2)}) is solid but not yet a differentiator. Invest in premium cues — materials, certifications, or packaging — that consumers notice before purchase.`
-            : `Quality perception (${d.score.toFixed(2)}) is a vulnerability for ${brand}. Prioritise product improvements and amplify through reviews, guarantees, and endorsements.`;
+          t = d.score >= 5.5 ? `You rated ${brand} very highly on quality (${d.score.toFixed(2)}). In your view, it clearly outperforms competitors on product and service standards.`
+            : d.score >= 4.0 ? `You see ${brand}'s quality (${d.score.toFixed(2)}) as above average but not exceptional. You recognise its standards without viewing them as a standout advantage over competitors.`
+            : `You rated ${brand}'s quality below the midpoint (${d.score.toFixed(2)}), suggesting you see it falling short of competitors on product and service standards.`;
         } else if (d.key === 'value') {
-          t = d.score >= 5.5 ? `${brand} delivers strong perceived value (${d.score.toFixed(2)}) — consumers feel they get more than they pay for. This drives repeat purchase and advocacy.`
-            : d.score >= 4.0 ? `${brand}'s value perception (${d.score.toFixed(2)}) is adequate but won't win price-sensitive segments. Consider bundling, loyalty rewards, or feature upgrades at the same price.`
-            : `Consumers don't see ${brand} as good value (${d.score.toFixed(2)}). Either reposition pricing or communicate benefits more clearly relative to cost.`;
+          t = d.score >= 5.5 ? `You perceive ${brand} as delivering strong value (${d.score.toFixed(2)}) — in your view, what you get clearly justifies what you pay compared to alternatives.`
+            : d.score >= 4.0 ? `You see ${brand}'s value (${d.score.toFixed(2)}) as reasonable but not outstanding. The price-to-benefit ratio doesn't strongly differentiate it from competitors in your eyes.`
+            : `You rated ${brand}'s value below the midpoint (${d.score.toFixed(2)}), indicating you don't feel the benefits justify the cost relative to competing brands.`;
         } else if (d.key === 'innovativeness') {
-          t = d.score >= 5.5 ? `${brand} is perceived as an innovator and trendsetter (${d.score.toFixed(2)}). Leverage this with first-to-market launches and thought leadership.`
-            : d.score >= 4.0 ? `${brand} is seen as reasonably innovative (${d.score.toFixed(2)}) but not a trendsetter. Increase visibility of new features or creative campaigns to build an innovation narrative.`
-            : `Consumers view ${brand} as behind on innovation (${d.score.toFixed(2)}). Signal change through visible product updates, creative partnerships, or bold marketing moves.`;
+          t = d.score >= 5.5 ? `You see ${brand} as a clear innovator (${d.score.toFixed(2)}) — a trendsetter that leads the way with new ideas and creative solutions in its category.`
+            : d.score >= 4.0 ? `You view ${brand} as reasonably innovative (${d.score.toFixed(2)}) but not a trendsetter. It keeps pace with the category without leading it, in your perception.`
+            : `You rated ${brand} low on innovativeness (${d.score.toFixed(2)}), suggesting you see it as behind competitors when it comes to new ideas and creative improvements.`;
         } else {
-          t = d.score >= 5.5 ? `${brand} has strong brand awareness and preference (${d.score.toFixed(2)}). This popularity creates social proof — leverage it in marketing and distribution.`
-            : d.score >= 4.0 ? `${brand} has moderate awareness (${d.score.toFixed(2)}) but isn't top-of-mind. Invest in reach — broader distribution, social presence, or partnerships with wider audiences.`
-            : `${brand} has low consumer awareness (${d.score.toFixed(2)}). Focus on recognition through consistent branding, increased touchpoints, and leveraging existing strengths.`;
+          t = d.score >= 5.5 ? `You see ${brand} as highly popular and well-recognised (${d.score.toFixed(2)}). In your perception, it enjoys strong consumer preference and awareness compared to rivals.`
+            : d.score >= 4.0 ? `You rate ${brand}'s popularity as moderate (${d.score.toFixed(2)}). You're aware of it but don't see it as a dominant or top-of-mind brand in its category.`
+            : `You rated ${brand}'s popularity low (${d.score.toFixed(2)}), suggesting you don't see it as widely recognised or preferred compared to its competitors.`;
         }
-        if (d.key === best) t += ` This is ${brand}'s strongest dimension.`;
-        if (d.key === worst) t += ` This is the biggest opportunity for improvement.`;
+        if (d.key === best) t += ` This is where you see ${brand} at its strongest.`;
+        if (d.key === worst) t += ` This is where your perception of ${brand} is weakest relative to competitors.`;
         html += `<div class="dim-insight-card">
           <div class="dim-insight-header"><span class="dim-insight-name">${d.name}</span><span class="dim-insight-score">${d.score.toFixed(2)} / 7</span></div>
           <div class="dim-insight-bar-track"><div class="dim-insight-bar-fill" style="width:${pct}%;background:${clr}"></div></div>
