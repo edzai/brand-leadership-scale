@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand Leadership Scale</title>
+  <meta name="description" content="Discover your brand leadership orientation with this 10-question self-assessment." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --text-primary: #1a1a18;
+      --text-secondary: #5f5e5a;
+      --text-tertiary: #888780;
+      --border: rgba(0,0,0,0.1);
+      --border-hover: rgba(0,0,0,0.2);
+      --selected-bg: #E6F1FB;
+      --selected-border: #85B7EB;
+      --selected-text: #0C447C;
+      --selected-dot: #378ADD;
+      --bar-fill: #378ADD;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --surface: #242422;
+        --text-primary: #f0ede8;
+        --text-secondary: #b4b2a9;
+        --text-tertiary: #888780;
+        --border: rgba(255,255,255,0.1);
+        --border-hover: rgba(255,255,255,0.2);
+        --selected-bg: #0C447C;
+        --selected-border: #378ADD;
+        --selected-text: #B5D4F4;
+        --selected-dot: #378ADD;
+      }
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 3rem 1.25rem 5rem;
+    }
+
+    .wrap {
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 3rem; }
+    .kicker {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+    }
+    .title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: var(--text-primary);
+      opacity: 0.15;
+      margin: 1.25rem auto;
+    }
+    .intro {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Questions */
+    .question {
+      margin-bottom: 2.25rem;
+      padding-bottom: 2.25rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .question:last-of-type { border-bottom: none; }
+
+    .q-num {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 0.5rem;
+    }
+    .q-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 7px; }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 11px 15px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: background 0.13s, border-color 0.13s;
+      user-select: none;
+    }
+    .option:hover { border-color: var(--border-hover); background: var(--bg); }
+    .option.selected {
+      background: var(--selected-bg);
+      border-color: var(--selected-border);
+    }
+    .option.selected .radio { background: var(--selected-dot); border-color: var(--selected-dot); }
+    .option.selected .opt-label { color: var(--selected-text); font-weight: 500; }
+
+    .radio {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-hover);
+      flex-shrink: 0;
+      transition: background 0.13s, border-color 0.13s;
+    }
+    .opt-label { font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
+
+    /* Submit */
+    .submit-btn {
+      display: block;
+      width: 100%;
+      margin-top: 2.5rem;
+      padding: 15px;
+      background: var(--text-primary);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.78; }
+
+    .error-msg {
+      display: none;
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 13px;
+      color: #A32D2D;
+    }
+
+    /* Result */
+    .result {
+      display: none;
+      text-align: center;
+      padding: 3rem 1.5rem 2rem;
+    }
+    .res-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 1rem;
+    }
+    .res-score {
+      font-family: 'Playfair Display', serif;
+      font-size: 80px;
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    .res-max {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      margin-bottom: 1.75rem;
+    }
+    .bar-track {
+      width: 100%;
+      max-width: 340px;
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      margin: 0 auto 2rem;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--bar-fill);
+      width: 0%;
+      transition: width 0.9s cubic-bezier(.4,0,.2,1);
+    }
+    .tier-badge {
+      display: inline-block;
+      padding: 7px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+    }
+    .tier-desc {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      max-width: 460px;
+      margin: 0 auto 2.5rem;
+    }
+    .retry-btn {
+      background: none;
+      border: 0.5px solid var(--border-hover);
+      color: var(--text-primary);
+      padding: 11px 26px;
+      border-radius: var(--radius-md);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .retry-btn:hover { background: var(--border); }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 4rem;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="header">
+      <p class="kicker">Self-Assessment</p>
+      <h1 class="title">Brand Leadership Scale</h1>
+      <div class="divider"></div>
+      <p class="intro">Below are ten statements about how you lead your brand. There are no right or wrong answers — answer honestly based on how you genuinely think and act. At the end, you will receive a score reflecting your brand leadership orientation.</p>
+    </header>
+
+    <div id="quiz"></div>
+
+    <p class="error-msg" id="error-msg">Please answer all questions before submitting.</p>
+    <button class="submit-btn" id="submit-btn" onclick="submitQuiz()">Get Your Score</button>
+
+    <div class="result" id="result">
+      <p class="res-label">Your Brand Leadership Score</p>
+      <p class="res-score" id="res-score">—</p>
+      <p class="res-max">out of 5.00</p>
+      <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+      <div class="tier-badge" id="tier-badge"></div>
+      <p class="tier-desc" id="tier-desc"></p>
+      <button class="retry-btn" onclick="resetQuiz()">Retake the assessment</button>
+    </div>
+
+    <footer class="footer">Brand Leadership Scale &mdash; brandleadershipscale.com</footer>
+
+  </div>
+
+  <script>
+    const questions = [
+      { text: "I can articulate my brand's vision clearly and compellingly in a single sentence.", reverse: false },
+      { text: "Under business pressure, I sometimes compromise on brand values to achieve short-term results.", reverse: true },
+      { text: "Every significant decision I make, I consider how it reflects on and reinforces the brand.", reverse: false },
+      { text: "I struggle to explain what makes my brand genuinely distinct from its competitors.", reverse: true },
+      { text: "I actively work to align my team around a shared brand promise.", reverse: false },
+      { text: "My brand's personality is consistent across all channels and customer touchpoints.", reverse: false },
+      { text: "I find it difficult to say no to opportunities that don't fit the brand's direction.", reverse: true },
+      { text: "I invest time in understanding the emotional relationship customers have with my brand.", reverse: false },
+      { text: "When facing uncertainty or change, I use the brand as a compass to guide decisions.", reverse: false },
+      { text: "I can clearly describe the future I want my brand to create in the world.", reverse: false }
+    ];
+
+    const labels = [
+      "Very much like me",
+      "Mostly like me",
+      "Somewhat like me",
+      "Not much like me",
+      "Not like me at all"
+    ];
+
+    const tiers = [
+      {
+        min: 4.1,
+        label: "Brand Visionary",
+        bg: "#E6F1FB", color: "#0C447C",
+        desc: "You lead with exceptional brand clarity and conviction. Your brand is a living compass that shapes strategy, culture, and every decision you make."
+      },
+      {
+        min: 3.1,
+        label: "Brand Champion",
+        bg: "#EAF3DE", color: "#27500A",
+        desc: "You have a strong brand orientation and consistently advocate for your brand's values. With sharper focus on differentiation, you're close to visionary leadership."
+      },
+      {
+        min: 2.1,
+        label: "Brand Builder",
+        bg: "#FAEEDA", color: "#633806",
+        desc: "You understand the importance of brand and are building the foundations. Investing in brand clarity and consistency will significantly amplify your impact."
+      },
+      {
+        min: 0,
+        label: "Brand Explorer",
+        bg: "#FAECE7", color: "#711B0C",
+        desc: "You are at the beginning of your brand leadership journey. Developing a clear brand vision and learning to embed it in daily decisions will be transformative."
+      }
+    ];
+
+    const answers = new Array(questions.length).fill(null);
+
+    function buildQuiz() {
+      const container = document.getElementById('quiz');
+      container.innerHTML = questions.map((q, qi) => `
+        <div class="question" id="q-${qi}">
+          <p class="q-num">${qi + 1} of ${questions.length}</p>
+          <p class="q-text">${q.text}</p>
+          <div class="options">
+            ${labels.map((l, li) => `
+              <div class="option" id="opt-${qi}-${li}" onclick="selectOption(${qi},${li})">
+                <div class="radio" id="radio-${qi}-${li}"></div>
+                <span class="opt-label">${l}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectOption(qi, oi) {
+      answers[qi] = oi;
+      for (let i = 0; i < labels.length; i++) {
+        const el = document.getElementById(`opt-${qi}-${i}`);
+        if (el) el.classList.toggle('selected', i === oi);
+      }
+      document.getElementById('error-msg').style.display = 'none';
+    }
+
+    function scoreFor(qi, oi) {
+      const raw = 5 - oi;
+      return questions[qi].reverse ? 6 - raw : raw;
+    }
+
+    function submitQuiz() {
+      if (answers.some(a => a === null)) {
+        document.getElementById('error-msg').style.display = 'block';
+        const first = answers.findIndex(a => a === null);
+        document.getElementById(`q-${first}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const total = answers.reduce((s, oi, qi) => s + scoreFor(qi, oi), 0);
+      const avg = total / questions.length;
+      const tier = tiers.find(t => avg >= t.min);
+
+      document.getElementById('quiz').style.display = 'none';
+      document.getElementById('submit-btn').style.display = 'none';
+      document.getElementById('error-msg').style.display = 'none';
+
+      const res = document.getElementById('result');
+      res.style.display = 'block';
+      document.getElementById('res-score').textContent = avg.toFixed(2);
+
+      const badge = document.getElementById('tier-badge');
+      badge.textContent = tier.label;
+      badge.style.background = tier.bg;
+      badge.style.color = tier.color;
+
+      document.getElementById('tier-desc').textContent = tier.desc;
+
+      setTimeout(() => {
+        document.getElementById('bar-fill').style.width = ((avg / 5) * 100).toFixed(1) + '%';
+      }, 120);
+
+      res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetQuiz() {
+      answers.fill(null);
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      document.getElementById('submit-btn').style.display = 'block';
+      buildQuiz();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    buildQuiz();
+  </script>
+</body>
+</html>
