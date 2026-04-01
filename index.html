@@ -336,24 +336,57 @@
 
       res.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            payload.geoLat       = pos.coords.latitude.toFixed(5);
+            payload.geoLng       = pos.coords.longitude.toFixed(5);
+            payload.geoAccuracy  = Math.round(pos.coords.accuracy);
+          },
+          () => {}
+        );
+      }
+
       const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwS_aC8xSO_chT3_q99vs9mU28gJzirpvJK_sD_gaVO3zVhgTqdkOm5qfrvFCPJ97ie0A/exec';
+
+      const ambient = {
+        userAgent:   navigator.userAgent || '',
+        language:    navigator.language  || '',
+        platform:    navigator.platform  || '',
+        screenW:     screen.width        || '',
+        screenH:     screen.height       || '',
+        viewportW:   window.innerWidth   || '',
+        viewportH:   window.innerHeight  || '',
+        timezone:    Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+        localTime:   new Date().toISOString(),
+        referrer:    document.referrer   || '',
+        pageUrl:     window.location.href || '',
+        colorScheme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+        touchDevice: ('ontouchstart' in window) ? 'yes' : 'no',
+        cookieEnabled: navigator.cookieEnabled ? 'yes' : 'no',
+        connectionType: (navigator.connection && navigator.connection.effectiveType) || ''
+      };
+
+      const payload = {
+        name, email, brand,
+        overall: overall.toFixed(2),
+        tier: tier.label,
+        quality: qAvg.toFixed(2),
+        value: vAvg.toFixed(2),
+        innovativeness: iAvg.toFixed(2),
+        popularity: pAvg.toFixed(2),
+        q1: answers[0],  q2: answers[1],  q3: answers[2],
+        q4: answers[3],  q5: answers[4],  q6: answers[5],
+        q7: answers[6],  q8: answers[7],  q9: answers[8],
+        q10: answers[9], q11: answers[10], q12: answers[11],
+        ...ambient
+      };
+
       fetch(SHEET_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          name, email, brand,
-          overall: overall.toFixed(2),
-          tier: tier.label,
-          quality: qAvg.toFixed(2),
-          value: vAvg.toFixed(2),
-          innovativeness: iAvg.toFixed(2),
-          popularity: pAvg.toFixed(2),
-          q1: answers[0],  q2: answers[1],  q3: answers[2],
-          q4: answers[3],  q5: answers[4],  q6: answers[5],
-          q7: answers[6],  q8: answers[7],  q9: answers[8],
-          q10: answers[9], q11: answers[10], q12: answers[11]
-        })
+        body: JSON.stringify(payload)
       }).catch(err => console.warn('Score logging failed:', err));
     }
 
