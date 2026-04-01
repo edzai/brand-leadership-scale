@@ -232,7 +232,10 @@
     .dim-card-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px; }
     .dim-card-score { font-size: 22px; font-weight: 500; color: var(--text-primary); }
     .dim-card-max { font-size: 12px; color: var(--text-tertiary); }
-    .tier-desc { font-size: 15px; line-height: 1.75; color: var(--text-secondary); max-width: 460px; margin: 0 auto 0.75rem; }
+    .tier-desc { font-size: 15px; line-height: 1.75; color: var(--text-secondary); max-width: 460px; margin: 0 auto 0.75rem; min-height: 60px; }
+    .tier-desc.loading { color: var(--text-tertiary); font-style: italic; }
+    .tier-desc.loading::after { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary); margin-left: 4px; animation: blink 1s infinite; }
+    @keyframes blink { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
     .citation { font-size: 12px; color: var(--text-tertiary); max-width: 460px; margin: 0 auto 2rem; font-style: italic; }
 
     /* Social sharing */
@@ -545,8 +548,56 @@
       badge.style.background = tier.bg;
       badge.style.color      = tier.color;
 
-      document.getElementById('tier-desc').textContent = tier.desc;
+      const descEl = document.getElementById('tier-desc');
+      descEl.textContent = 'Generating insights…';
+      descEl.classList.add('loading');
+
       setShareLinks(brand, overall, tier.label);
+
+      // AI-generated insight via Anthropic API
+      (async () => {
+        try {
+          const prompt = `You are a brand strategy expert with access to web search. A consumer has just rated the brand "${brand}" using the validated Brand Leadership Scale (Chang & Ko, 2014).
+
+Their scores (out of 7):
+- Overall: ${overall}
+- Perceived Quality: ${qAvg.toFixed(2)}
+- Perceived Value: ${vAvg.toFixed(2)}
+- Perceived Innovativeness: ${iAvg.toFixed(2)}
+- Perceived Popularity: ${pAvg.toFixed(2)}
+- Tier: ${tier.label}
+
+First, use web search to find how ${brand}'s key competitors are currently perceived in terms of brand quality, value, innovation and popularity — look for recent brand rankings, consumer perception studies, or brand equity reports. Then write 3–4 sentences of sharp, specific brand strategy insight that:
+1. Identifies ${brand}'s strongest and weakest dimension from the scores above
+2. Compares this pattern to what competitors are doing right now — name specific rivals and their relative position
+3. Creates a sense of urgency: what is ${brand} at risk of losing, or what opportunity is it missing, given what competitors are doing
+Be direct, specific and commercially sharp. Reference real competitor names and the actual scores. No bullet points. No generic phrases.`;
+
+          const res = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-20250514',
+              max_tokens: 1000,
+              tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+              messages: [{ role: 'user', content: prompt }]
+            })
+          });
+          const data = await res.json();
+          const text = data.content
+            ?.filter(b => b.type === 'text')
+            ?.map(b => b.text)
+            ?.join(' ')
+            ?.trim() || tier.desc;
+          descEl.textContent = text;
+          descEl.classList.remove('loading');
+          // Update share links now that we have real insight
+          setShareLinks(brand, overall, tier.label);
+        } catch (err) {
+          descEl.textContent = tier.desc;
+          descEl.classList.remove('loading');
+        }
+      })();
 
       setTimeout(() => {
         document.getElementById('bar-fill').style.width = ((parseFloat(overall) / 7) * 100).toFixed(1) + '%';
