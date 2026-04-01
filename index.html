@@ -530,6 +530,45 @@
       const overall = ((qAvg + vAvg + iAvg + pAvg) / 4).toFixed(2);
       const tier    = tiers.find(t => parseFloat(overall) >= t.min);
 
+      const dimScores = [
+        { name: 'perceived quality', score: qAvg },
+        { name: 'perceived value', score: vAvg },
+        { name: 'perceived innovativeness', score: iAvg },
+        { name: 'perceived popularity', score: pAvg }
+      ];
+      const sorted = [...dimScores].sort((a, b) => b.score - a.score);
+      const strongest = sorted[0];
+      const weakest   = sorted[sorted.length - 1];
+      const gap       = (strongest.score - weakest.score).toFixed(1);
+
+      function buildFallbackInsight() {
+        const above = dimScores.filter(d => d.score >= 5.5).map(d => d.name);
+        const below = dimScores.filter(d => d.score < 4.0).map(d => d.name);
+
+        let insight = `${brand} scored ${overall}/7 overall. Its strongest dimension is ${strongest.name} at ${strongest.score.toFixed(2)}, while ${weakest.name} is the weakest at ${weakest.score.toFixed(2)} — a gap of ${gap} points.`;
+
+        if (parseFloat(overall) >= 5.5) {
+          insight += ` ${brand} demonstrates clear leadership across all four dimensions.`;
+          if (weakest.score < 5.5) {
+            insight += ` Closing the gap on ${weakest.name} would solidify its dominant position and make it harder for competitors to challenge.`;
+          }
+        } else if (parseFloat(overall) >= 4.0) {
+          insight += ` To move from contender to leader, ${brand} should prioritise improving ${weakest.name}${below.length > 0 ? ', which currently falls below the competitive midpoint' : ''}.`;
+          if (above.length > 0) {
+            insight += ` Its strength in ${above.join(' and ')} provides a solid foundation to build from.`;
+          }
+        } else if (parseFloat(overall) >= 2.5) {
+          insight += ` ${brand} has room to grow — focusing on ${weakest.name} would have the most immediate impact on overall brand perception.`;
+          if (strongest.score >= 4.0) {
+            insight += ` Its relatively strong ${strongest.name} score (${strongest.score.toFixed(2)}) shows it can compete; applying the same rigour to weaker dimensions would shift its competitive position.`;
+          }
+        } else {
+          insight += ` ${brand} currently trails competitors across most dimensions. A focused strategy starting with ${strongest.name} — its relative bright spot — could build momentum before tackling gaps in ${weakest.name}.`;
+        }
+
+        return insight;
+      }
+
       document.getElementById('quiz').style.display        = 'none';
       document.getElementById('submit-btn').style.display  = 'none';
       document.getElementById('error-msg').style.display   = 'none';
@@ -588,13 +627,13 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
             ?.filter(b => b.type === 'text')
             ?.map(b => b.text)
             ?.join(' ')
-            ?.trim() || tier.desc;
+            ?.trim() || buildFallbackInsight();
           descEl.textContent = text;
           descEl.classList.remove('loading');
           // Update share links now that we have real insight
           setShareLinks(brand, overall, tier.label);
         } catch (err) {
-          descEl.textContent = tier.desc;
+          descEl.textContent = buildFallbackInsight();
           descEl.classList.remove('loading');
         }
       })();
