@@ -1,7 +1,16 @@
 {
   "name": "brand-leadership-scale",
   "compatibility_date": "2026-04-01",
+  "main": "src/worker.js",
   "assets": {
     "directory": "./"
-  }
+  },
+  // Create with: npx wrangler kv namespace create BLS_KV
+  // Then replace the id below with the output id.
+  "kv_namespaces": [
+    {
+      "binding": "BLS_KV",
+      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+    }
+  ]
 }
