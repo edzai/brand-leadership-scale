@@ -268,8 +268,8 @@
     .progress-text { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 5px; letter-spacing: 0.05em; }
 
     /* Radar */
-    .radar-section { margin: 1.5rem auto 0.5rem; max-width: 400px; }
-    .radar-canvas { display: block; margin: 0 auto; max-width: 340px; }
+    .radar-section { margin: 1.5rem auto 0.5rem; max-width: 460px; }
+    .radar-canvas { display: block; margin: 0 auto; max-width: 440px; }
     .radar-legend { display: flex; justify-content: center; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
     .radar-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
     .radar-legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
@@ -308,7 +308,7 @@
       .res-score { font-size: 60px; }
       .tier-desc, .dim-insight-text, .benchmark-note, .citation { color: #333 !important; }
       .dim-insight-card { break-inside: avoid; }
-      .radar-canvas { max-width: 260px; }
+      .radar-canvas { max-width: 340px; }
       .compare-table th, .compare-table td { color: #000 !important; }
     }
 
@@ -369,7 +369,7 @@
       <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
       <div class="tier-badge" id="tier-badge"></div>
       <div class="radar-section">
-        <canvas class="radar-canvas" id="radar-canvas" width="340" height="340"></canvas>
+        <canvas class="radar-canvas" id="radar-canvas" width="440" height="380"></canvas>
         <div class="radar-legend" id="radar-legend"></div>
       </div>
       <p class="benchmark-note">Dashed line = scale midpoint (4.0). Scores above 5.0 indicate strong positive consumer perception relative to competitors.</p>
@@ -864,24 +864,24 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
     function drawRadar(datasets) {
       const canvas = document.getElementById('radar-canvas');
       const dpr = window.devicePixelRatio || 1;
-      const S = 340;
-      canvas.width = S * dpr;
-      canvas.height = S * dpr;
+      const W = 440, H = 380;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
       canvas.style.width = '100%';
-      canvas.style.maxWidth = S + 'px';
+      canvas.style.maxWidth = W + 'px';
       canvas.style.height = 'auto';
-      canvas.style.aspectRatio = '1';
+      canvas.style.aspectRatio = W + '/' + H;
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      const C = S / 2, R = S / 2 - 45, MX = 7, N = 4;
+      const CX = W / 2, CY = H / 2, R = 120, MX = 7, N = 4;
       const step = (2 * Math.PI) / N, start = -Math.PI / 2;
       const labels = ['Quality', 'Value', 'Innovativeness', 'Popularity'];
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const grid = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
       const txt = '#888780';
 
-      ctx.clearRect(0, 0, S, S);
+      ctx.clearRect(0, 0, W, H);
 
       // Grid polygons
       for (let l = 1; l <= 7; l++) {
@@ -889,7 +889,7 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
         const r = (l / MX) * R;
         for (let i = 0; i <= N; i++) {
           const a = start + (i % N) * step;
-          i === 0 ? ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a)) : ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a));
+          i === 0 ? ctx.moveTo(CX + r * Math.cos(a), CY + r * Math.sin(a)) : ctx.lineTo(CX + r * Math.cos(a), CY + r * Math.sin(a));
         }
         ctx.stroke();
       }
@@ -897,33 +897,33 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
       for (let i = 0; i < N; i++) {
         const a = start + i * step;
         ctx.beginPath(); ctx.strokeStyle = grid; ctx.lineWidth = 0.5;
-        ctx.moveTo(C, C); ctx.lineTo(C + R * Math.cos(a), C + R * Math.sin(a)); ctx.stroke();
+        ctx.moveTo(CX, CY); ctx.lineTo(CX + R * Math.cos(a), CY + R * Math.sin(a)); ctx.stroke();
       }
       // Benchmark at 4.0 (midpoint)
       ctx.beginPath(); ctx.strokeStyle = txt; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
       const bR = (4 / MX) * R;
       for (let i = 0; i <= N; i++) {
         const a = start + (i % N) * step;
-        i === 0 ? ctx.moveTo(C + bR * Math.cos(a), C + bR * Math.sin(a)) : ctx.lineTo(C + bR * Math.cos(a), C + bR * Math.sin(a));
+        i === 0 ? ctx.moveTo(CX + bR * Math.cos(a), CY + bR * Math.sin(a)) : ctx.lineTo(CX + bR * Math.cos(a), CY + bR * Math.sin(a));
       }
       ctx.stroke(); ctx.setLineDash([]);
       // Scale numbers along first axis
       ctx.fillStyle = txt; ctx.font = '9px DM Sans, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
       [1, 2, 3, 4, 5, 6, 7].forEach(v => {
         const r = (v / MX) * R;
-        ctx.fillText(v, C - 6, C - r);
+        ctx.fillText(v, CX - 6, CY - r);
       });
       // Data polygons
       datasets.forEach(ds => {
         ctx.beginPath();
-        ds.values.forEach((v, i) => { const a = start + i * step; const r = (v / MX) * R; i === 0 ? ctx.moveTo(C + r * Math.cos(a), C + r * Math.sin(a)) : ctx.lineTo(C + r * Math.cos(a), C + r * Math.sin(a)); });
+        ds.values.forEach((v, i) => { const a = start + i * step; const r = (v / MX) * R; i === 0 ? ctx.moveTo(CX + r * Math.cos(a), CY + r * Math.sin(a)) : ctx.lineTo(CX + r * Math.cos(a), CY + r * Math.sin(a)); });
         ctx.closePath(); ctx.fillStyle = ds.fill; ctx.fill(); ctx.strokeStyle = ds.stroke; ctx.lineWidth = 2; ctx.stroke();
-        ds.values.forEach((v, i) => { const a = start + i * step; const r = (v / MX) * R; ctx.beginPath(); ctx.arc(C + r * Math.cos(a), C + r * Math.sin(a), 4, 0, 2 * Math.PI); ctx.fillStyle = ds.stroke; ctx.fill(); });
+        ds.values.forEach((v, i) => { const a = start + i * step; const r = (v / MX) * R; ctx.beginPath(); ctx.arc(CX + r * Math.cos(a), CY + r * Math.sin(a), 4, 0, 2 * Math.PI); ctx.fillStyle = ds.stroke; ctx.fill(); });
       });
       // Axis labels
-      ctx.fillStyle = txt; ctx.font = '12px DM Sans, sans-serif';
+      ctx.fillStyle = txt; ctx.font = '13px DM Sans, sans-serif';
       labels.forEach((lb, i) => {
-        const a = start + i * step, x = C + (R + 22) * Math.cos(a), y = C + (R + 22) * Math.sin(a);
+        const a = start + i * step, x = CX + (R + 28) * Math.cos(a), y = CY + (R + 28) * Math.sin(a);
         ctx.textAlign = i === 1 ? 'left' : i === 3 ? 'right' : 'center';
         ctx.textBaseline = i === 0 ? 'bottom' : i === 2 ? 'top' : 'middle';
         ctx.fillText(lb, x, y);
