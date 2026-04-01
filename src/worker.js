@@ -33,6 +33,13 @@ const TIERS = [
   { min: 0,   label: 'Brand Follower' },
 ];
 
+const PLAN_LIMITS = {
+  free:       100,
+  starter:    1000,
+  pro:        10000,
+  enterprise: null,  // unlimited
+};
+
 // ── Entry point ─────────────────────────────────────────────────
 
 export default {
@@ -138,10 +145,10 @@ async function apiScore(request, env) {
 
   const month = new Date().toISOString().slice(0, 7);
   const used  = keyData.usage?.[month] || 0;
-  const limit = keyData.plan === 'free' ? 100 : null;
+  const limit = PLAN_LIMITS[keyData.plan] ?? PLAN_LIMITS.free;
 
   if (limit && used >= limit) {
-    return json({ error: 'Monthly limit reached (100/month on free plan).', usage: used, limit }, 429);
+    return json({ error: `Monthly limit reached (${limit}/month on ${keyData.plan} plan). Upgrade at /docs.html`, usage: used, limit }, 429);
   }
 
   const body = await request.json();
@@ -210,7 +217,7 @@ async function generateKey(request, env) {
   }));
   await env.BLS_KV.put(`key:email:${emailKey}`, key);
 
-  return json({ api_key: key, plan: 'free', rate_limit: '100 requests/month' });
+  return json({ api_key: key, plan: 'free', rate_limit: '100 requests/month', upgrade: '/docs.html' });
 }
 
 async function getKeyStatus(key, env) {
@@ -218,10 +225,11 @@ async function getKeyStatus(key, env) {
   if (!data) return json({ error: 'Invalid API key' }, 404);
 
   const month = new Date().toISOString().slice(0, 7);
+  const limit = PLAN_LIMITS[data.plan] ?? PLAN_LIMITS.free;
   return json({
     plan: data.plan,
     created: data.created,
     usage_this_month: data.usage?.[month] || 0,
-    limit: data.plan === 'free' ? 100 : null,
+    limit,
   });
 }
