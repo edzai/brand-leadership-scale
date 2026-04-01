@@ -514,9 +514,22 @@
     const answers = new Array(12).fill(null);
     let brandResults = [];
 
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
     function buildQuiz() {
       const container = document.getElementById('quiz');
-      const brand = document.getElementById('field-brand')?.value.trim() || 'this brand';
+      const brandRaw = document.getElementById('field-brand')?.value.trim() || 'this brand';
+      const brand = esc(brandRaw);
       let html = '';
       let qi = 0;
       dimensions.forEach((dim, di) => {
@@ -591,13 +604,25 @@
     function submitQuiz() {
       const name  = document.getElementById('field-name').value.trim();
       const email = document.getElementById('field-email').value.trim();
-      const brand = document.getElementById('field-brand').value.trim();
+      const brand = esc(document.getElementById('field-brand').value.trim());
       const errEl = document.getElementById('error-msg');
 
       if (!name || !email || !brand) {
         errEl.textContent = 'Please enter your name, email and the brand you are rating.';
         errEl.style.display = 'block';
         document.getElementById('field-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errEl.textContent = 'Please enter a valid email address.';
+        errEl.style.display = 'block';
+        document.getElementById('field-email').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errEl.textContent = 'Please enter a valid email address.';
+        errEl.style.display = 'block';
+        document.getElementById('field-email').scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
       if (answers.some(a => a === null)) {
@@ -700,9 +725,12 @@ First, use web search to find how ${brand}'s key competitors are currently perce
 3. Creates a sense of urgency: what is ${brand} at risk of losing, or what opportunity is it missing, given what competitors are doing
 Be direct, specific and commercially sharp. Reference real competitor names and the actual scores. No bullet points. No generic phrases.`;
 
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
           const res = await fetch('https://brand-leadership-scale.edzaizvobwo.workers.dev/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
               model: 'claude-sonnet-4-20250514',
               max_tokens: 1000,
@@ -710,6 +738,7 @@ Be direct, specific and commercially sharp. Reference real competitor names and 
               messages: [{ role: 'user', content: prompt }]
             })
           });
+          clearTimeout(timeout);
           const data = await res.json();
           const text = data.content
             ?.filter(b => b.type === 'text')
